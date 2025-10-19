@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Device Verification</title>
+  <style>
+    :root {
+      --primary: #4361ee;
+      --success: #06d6a0;
+      --danger: #ef476f;
+      --warning: #ffd166;
+      --dark: #1a1a2e;
+      --light: #f8f9fa;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background: linear-gradient(135deg, var(--dark) 0%, #16213e 100%);
+      color: var(--light);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      transition: background 0.6s ease;
+    }
+    
+    .container {
+      width: 100%;
+      max-width: 500px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      text-align: center;
+    }
+    
+    .logo {
+      font-size: 3rem;
+      margin-bottom: 20px;
+    }
+    
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+      background: linear-gradient(90deg, var(--primary), var(--success));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    
+    .description {
+      color: #aaa;
+      margin-bottom: 30px;
+      line-height: 1.5;
+    }
+    
+    .status-card {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 25px;
+      margin-bottom: 25px;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+    
+    .status-icon {
+      font-size: 4rem;
+      margin-bottom: 20px;
+    }
+    
+    .status-title {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+    
+    .status-message {
+      color: #aaa;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+    
+    .progress-container {
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      margin: 25px 0;
+      overflow: hidden;
+    }
+    
+    .progress-bar {
+      height: 100%;
+      background: var(--primary);
+      border-radius: 3px;
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+    
+    .loading {
+      display: flex;
+      justify-content: center;
+      margin: 30px 0;
+    }
+    
+    .spinner {
+      width: 60px;
+      height: 60px;
+      border: 5px solid rgba(255, 255, 255, 0.1);
+      border-top: 5px solid var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    .device-id {
+      background: rgba(0, 0, 0, 0.2);
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 20px;
+      font-family: monospace;
+      word-break: break-all;
+      font-size: 0.9rem;
+    }
+    
+    .btn {
+      padding: 12px 30px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 20px;
+      display: inline-block;
+    }
+    
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #3a56d4;
+    }
+    
+    .btn-danger {
+      background: var(--danger);
+      color: white;
+    }
+    
+    .btn-danger:hover {
+      background: #d93654;
+    }
+    
+    .btn-warning {
+      background: var(--warning);
+      color: black;
+    }
+    
+    .btn-warning:hover {
+      background: #e6b301;
+    }
+    
+    .hidden {
+      display: none;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .success {
+      color: var(--success);
+    }
+    
+    .error {
+      color: var(--danger);
+    }
+    
+    .warning {
+      color: var(--warning);
+    }
+    
+    .vpn-warning {
+      background: rgba(239, 71, 111, 0.2);
+      border: 1px solid var(--danger);
+      padding: 15px;
+      border-radius: 10px;
+      margin: 20px 0;
+    }
+    
+    .same-device-warning {
+      background: rgba(255, 209, 102, 0.2);
+      border: 1px solid var(--warning);
+      padding: 15px;
+      border-radius: 10px;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">🔒</div>
+    <h1>Device Verification</h1>
+    <p class="description">Verifying your device for security purposes</p>
+    
+    <div class="status-card">
+      <div id="statusIcon" class="status-icon">⏳</div>
+      <div id="statusTitle" class="status-title">Verifying Device</div>
+      <div id="statusMessage" class="status-message">Please wait while we check your device...</div>
+      
+      <div class="progress-container">
+        <div id="progressBar" class="progress-bar"></div>
+      </div>
+      
+      <div class="loading">
+        <div id="spinner" class="spinner"></div>
+      </div>
+      
+      <div id="deviceId" class="device-id hidden"></div>
+      
+      <div id="vpnWarning" class="vpn-warning hidden">
+        <strong>📵 VPN Not Allowed</strong>
+        <p style="margin-top: 10px; font-size: 0.9rem;">Our system has detected that you are using a VPN or proxy service. Please disable it to continue with verification.</p>
+      </div>
+      
+      <div id="sameDeviceWarning" class="same-device-warning hidden">
+        <strong>❌ Same Device Detected</strong>
+        <p style="margin-top: 10px; font-size: 0.9rem;">This device has already been verified. You can still refer friends to earn rewards!</p>
+      </div>
+    </div>
+    
+    <button id="closeBtn" class="btn btn-primary hidden">Close</button>
+    <button id="retryBtn" class="btn btn-danger hidden">Retry Without VPN</button>
+    <button id="continueBtn" class="btn btn-warning hidden">Continue Anyway</button>
+  </div>
+
+  <script>
+    // DOM Elements
+    const statusIcon = document.getElementById('statusIcon');
+    const statusTitle = document.getElementById('statusTitle');
+    const statusMessage = document.getElementById('statusMessage');
+    const progressBar = document.getElementById('progressBar');
+    const spinner = document.getElementById('spinner');
+    const deviceId = document.getElementById('deviceId');
+    const vpnWarning = document.getElementById('vpnWarning');
+    const sameDeviceWarning = document.getElementById('sameDeviceWarning');
+    const closeBtn = document.getElementById('closeBtn');
+    const retryBtn = document.getElementById('retryBtn');
+    const continueBtn = document.getElementById('continueBtn');
+
+    // URL Parameters
+    const params = new URLSearchParams(window.location.search);
+    const webhookUrl = decodeURIComponent(params.get("webhookUrl") || "");
+    const botId = params.get("botId") || "";
+
+    // Server verification status tracking
+    let serverVerificationStatus = {
+      verifiedDevices: [],
+      blockedVPNs: []
+    };
+
+    // Initialize server status from localStorage
+    function initializeServerStatus() {
+      const stored = localStorage.getItem('serverVerificationStatus');
+      if (stored) {
+        serverVerificationStatus = JSON.parse(stored);
+      }
+    }
+
+    // Save server status to localStorage
+    function saveServerStatus() {
+      localStorage.setItem('serverVerificationStatus', JSON.stringify(serverVerificationStatus));
+    }
+
+    // Start verification immediately
+    document.addEventListener('DOMContentLoaded', () => {
+      initializeServerStatus();
+      startVerification();
+    });
+
+    async function startVerification() {
+      try {
+        // Update progress
+        updateProgress(10, "Initializing verification...");
+        await delay(1000);
+        
+        // Create device fingerprint (user_hash)
+        updateProgress(30, "Creating device fingerprint...");
+        const user_hash = createUserHash();
+        deviceId.textContent = `Device ID: ${user_hash}`;
+        deviceId.classList.remove('hidden');
+        await delay(1500);
+        
+        // Check for VPN
+        updateProgress(50, "Checking for VPN...");
+        const vpn = await checkForVPN();
+        await delay(1500);
+        
+        // Check if device is already verified
+        updateProgress(70, "Checking verification status...");
+        const alreadyVerified = serverVerificationStatus.verifiedDevices.includes(user_hash);
+        await delay(1000);
+        
+        // Prepare results for bot
+        const results = {
+          user_hash: user_hash,
+          captcha: "true",
+          vpn: vpn ? "true" : "false"
+        };
+        
+        if (vpn) {
+          // VPN detected
+          updateProgress(100, "VPN detected!");
+          showVPNBlocked(results);
+        } else if (alreadyVerified) {
+          // Same device detected
+          updateProgress(100, "Same device detected!");
+          showSameDevice(results);
+        } else {
+          // New device - verify it
+          updateProgress(90, "Finalizing verification...");
+          
+          // Add to verified devices
+          serverVerificationStatus.verifiedDevices.push(user_hash);
+          saveServerStatus();
+          
+          await delay(1000);
+          
+          updateProgress(100, "Verification complete!");
+          showResult("success", "✅ Verification Successful", "Your device has been successfully verified.");
+          sendWebhook(results, "verified");
+        }
+      } catch (error) {
+        console.error('Verification error:', error);
+        showResult("error", "❌ Verification Failed", "An unexpected error occurred. Please try again.");
+      }
+    }
+
+    function updateProgress(percent, message) {
+      progressBar.style.width = `${percent}%`;
+      statusMessage.textContent = message;
+    }
+
+    function showVPNBlocked(results) {
+      spinner.style.display = 'none';
+      
+      statusIcon.textContent = "📵";
+      statusIcon.className = "status-icon error";
+      statusTitle.textContent = "VPN Not Allowed";
+      statusMessage.textContent = "Our system has detected a VPN or proxy connection.";
+      
+      vpnWarning.classList.remove('hidden');
+      retryBtn.classList.remove('hidden');
+      
+      document.body.style.background = "linear-gradient(135deg, #3a1a1a 0%, #5c0f0f 100%)";
+      
+      sendWebhook(results, "vpn_blocked");
+    }
+
+    function showSameDevice(results) {
+      spinner.style.display = 'none';
+      
+      statusIcon.textContent = "❌";
+      statusIcon.className = "status-icon warning";
+      statusTitle.textContent = "Same Device Detected";
+      statusMessage.textContent = "This device has already been verified before.";
+      
+      sameDeviceWarning.classList.remove('hidden');
+      continueBtn.classList.remove('hidden');
+      closeBtn.classList.remove('hidden');
+      
+      document.body.style.background = "linear-gradient(135deg, #3a3a1a 0%, #5c5c0f 100%)";
+      
+      sendWebhook(results, "already_verified");
+    }
+
+    function showResult(type, title, message) {
+      spinner.style.display = 'none';
+      
+      if (type === "success") {
+        statusIcon.textContent = "✅";
+        statusIcon.className = "status-icon success";
+        document.body.style.background = "linear-gradient(135deg, #1a3a1a 0%, #0f5c0f 100%)";
+      } else if (type === "error") {
+        statusIcon.textContent = "❌";
+        statusIcon.className = "status-icon error";
+        document.body.style.background = "linear-gradient(135deg, #3a1a1a 0%, #5c0f0f 100%)";
+      }
+      
+      statusTitle.textContent = title;
+      statusMessage.textContent = message;
+      closeBtn.classList.remove('hidden');
+    }
+
+    function createUserHash() {
+      // Create a unique user_hash using multiple device attributes
+      const factors = [
+        navigator.userAgent,
+        navigator.hardwareConcurrency,
+        screen.width,
+        screen.height,
+        screen.colorDepth,
+        navigator.language,
+        new Date().getTimezoneOffset(),
+        navigator.platform,
+        navigator.deviceMemory || 'unknown',
+        navigator.maxTouchPoints || 'unknown'
+      ].join('|');
+      
+      // Create a hash
+      let hash = 0;
+      for (let i = 0; i < factors.length; i++) {
+        const char = factors.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash;
+      }
+      
+      return Math.abs(hash).toString(36).slice(0, 12).toUpperCase();
+    }
+
+    async function checkForVPN() {
+      try {
+        const pc = new RTCPeerConnection({ iceServers: [] });
+        pc.createDataChannel('');
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
+        
+        return new Promise(resolve => {
+          let vpnDetected = false;
+          
+          pc.onicecandidate = (ice) => {
+            if (!ice || !ice.candidate) {
+              resolve(vpnDetected);
+              return;
+            }
+            
+            const candidate = ice.candidate.candidate;
+            if (candidate.includes('relay') || candidate.includes('srflx') || 
+                candidate.includes('turn') || candidate.includes('vpn') ||
+                candidate.includes('proxy')) {
+              vpnDetected = true;
+            }
+          };
+          
+          setTimeout(() => resolve(vpnDetected), 2000);
+        });
+      } catch (error) {
+        console.error('VPN check error:', error);
+        return false;
+      }
+    }
+
+    function sendWebhook(results, status) {
+      if (!webhookUrl) return;
+      
+      const payload = {
+        botId: botId,
+        status: status,
+        results: results,
+        timestamp: new Date().toISOString()
+      };
+      
+      fetch(webhookUrl, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload)
+      }).then(response => {
+        console.log('Webhook sent successfully');
+      }).catch(error => {
+        console.error('Webhook error:', error);
+      });
+    }
+
+    function delay(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    // Enhanced close button functionality
+    closeBtn.addEventListener('click', () => {
+      // Try multiple methods to close the window
+      
+      // Method 1: Standard window.close()
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        window.close();
+      }
+      
+      // Method 2: If window.close doesn't work, try to redirect
+      setTimeout(() => {
+        // If we're still here after 1 second, try redirecting
+        window.location.href = 'about:blank';
+      }, 1000);
+      
+      // Method 3: Final fallback - show message
+      setTimeout(() => {
+        // If we're still here after 2 seconds, show message
+        closeBtn.textContent = 'You can safely close this tab now';
+        closeBtn.style.backgroundColor = '#06d6a0';
+      }, 2000);
+    });
+
+    // Retry button functionality
+    retryBtn.addEventListener('click', () => {
+      // Reset UI and restart verification
+      vpnWarning.classList.add('hidden');
+      retryBtn.classList.add('hidden');
+      closeBtn.classList.add('hidden');
+      
+      progressBar.style.width = '0%';
+      spinner.style.display = 'block';
+      statusIcon.textContent = '⏳';
+      statusTitle.textContent = 'Verifying Device';
+      statusMessage.textContent = 'Please wait while we check your device...';
+      document.body.style.background = "linear-gradient(135deg, var(--dark) 0%, #16213e 100%)";
+      
+      // Restart verification
+      startVerification();
+    });
+
+    // Continue button for same device
+    continueBtn.addEventListener('click', () => {
+      // Close the window
+      closeBtn.click();
+    });
+  </script>
+</body>
+</html>
